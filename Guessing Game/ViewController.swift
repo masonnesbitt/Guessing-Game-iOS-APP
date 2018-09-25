@@ -9,13 +9,14 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var reset: UIButton!
     @IBOutlet weak var triesRemaining: UILabel!
     @IBOutlet weak var greetingLabel: UILabel!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var guessStatusLabel: UILabel!
     @IBOutlet weak var submit: UIButton!
     @IBOutlet weak var triesRemainingInt: UILabel!
+    @IBOutlet weak var reset: UIButton!
+    @IBOutlet weak var hiddenNumber: UILabel!
     
     var playAgainBool = false
     var number = Int(arc4random_uniform(99)) + 1
@@ -28,50 +29,66 @@ class ViewController: UIViewController {
         gameStart()
     }
     
+
+    @IBAction func onReset2Pressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Reset", message: "Are you sure you want to Reset?", preferredStyle: .alert)
+        let action1 = UIAlertAction(title: "Restart", style: .default) { (action) in
+            self.gameStart()
+        }
+        alert.addAction(action1)
+        present(alert, animated: true, completion: nil)
+    }
     func gameStart(){
         number = Int(arc4random_uniform(99)) + 1
-        counter += 5
+        counter = 4
         triesRemainingInt.text = " \(counter)"
         greetingLabel.text = """
                                                         Welcome to the Guessing Game.
                                                         Plese Enter a Number
                                                         """
+        guessStatusLabel.text = ""
+        hiddenNumber.text = ""
     }
     
     
     func playAgain(){
-        guessStatusLabel.text = "Would you like to play again? Y/N"
-        if textField.text?.lowercased() == "yes"{
-            gameStart()
-        } else{
-            guessStatusLabel.text = "Thanks for Playing"
+        let alert = UIAlertController(title: "Game Over", message: "Would you like to Play Again?", preferredStyle: .alert)
+        let action1 = UIAlertAction(title: "Restart", style: .default) { (action) in
+            self.gameStart()
         }
+        alert.addAction(action1)
+        present(alert, animated: true, completion: nil)
     }
     
     
+    
     @IBAction func guessTest(_ sender:UIButton) {
-        if counter < 4 {
-            var textFieldInt: Int? = Int(textField.text!)
-            if textField.text == ""{
-                textFieldInt = 0
+        if counter != 0 {
+            guard let textFieldInt = Int(textField.text!) else{
+                guessStatusLabel.text = "Please Enter a Number"
+                return
             }
             if textFieldInt == number {
                 guessStatusLabel.text = "You win!"
                 playAgain()
+                triesRemainingInt.text = " \(counter)"
             }
-            if textFieldInt! > number {
+            if textFieldInt > number {
                 guessStatusLabel.text = "Guess too High. Please Try again."
-                counter += 1
+                counter -= 1
+                triesRemainingInt.text = " \(counter)"
             }
             else {
                 guessStatusLabel.text = "Guess Too Low. Please Try Again."
-                counter += 1
+                counter -= 1
+                triesRemainingInt.text = " \(counter)"
             }
     }else {
-            guessStatusLabel.text = "Sorry you are out of guesses. /nThe correct number was \(number)"
+            guessStatusLabel.text = "Sorry you are out of Guesses"
             playAgain()
+            hiddenNumber.text = "\(number)"
         }
-        
+
     }
     
     
